@@ -126,8 +126,10 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-          # Token audience must match the condition in the OIDC trust policy
+          # Required for OIDC to work correctly
           audience: sts.amazonaws.com
+          # Set to true to export credentials as environment variables
+          output-env-credentials: true
 
       # ── Log in to Amazon ECR ──────────────────────────────────────────────
       - name: Log in to Amazon ECR
