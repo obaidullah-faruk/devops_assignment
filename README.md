@@ -118,3 +118,5 @@ IAM:
   - AmazonECSTaskExecutionRolePolicy (for execution role)
   - CloudWatch Logs permissions
 - Remove any inline X-Ray policies that duplicate this functionality"
+
+**Prompt 9**

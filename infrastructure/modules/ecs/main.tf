@@ -122,6 +122,38 @@ resource "aws_ecs_task_definition" "app" {
         retries     = 3
         startPeriod = 60
       }
+    },
+    {
+      name      = "adot-collector"
+      image     = "public.ecr.aws/aws-observability/aws-otel-collector:latest"
+      essential = true
+
+      portMappings = [
+        {
+          containerPort = 4317
+          protocol      = "tcp"
+        }
+      ]
+
+      command = [
+        "--config=/etc/ecs/ecs-default-config.yaml"
+      ]
+
+      environment = [
+        {
+          name  = "AWS_REGION"
+          value = var.aws_region
+        }
+      ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.app.name
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "ecs-adot"
+        }
+      }
     }
   ])
 
