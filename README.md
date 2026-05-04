@@ -21,8 +21,7 @@ uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 ## Architecture Diagram 
 ![Alt text](images/assignment_arch.png)
 
-
-## To Run using Docker 
+## To Run using Docker in local machine 
 ```
 docker compose up --build
 
@@ -188,3 +187,7 @@ push to main
               ├─ Render new ECS task definition
               └─ ECS rolling update  (wait for stability)
 ```
+
+
+### CI/CD Pipeline (github actions)
+![Alt text](images/pipeline.png)

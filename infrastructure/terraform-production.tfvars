@@ -18,7 +18,7 @@ task_memory           = 1024
 service_desired_count = 1
 
 # ECR
-ecr_image_tag_mutability = "IMMUTABLE"
+ecr_image_tag_mutability = "MUTABLE"
 ecr_scan_on_push         = true
 
 # ALB
