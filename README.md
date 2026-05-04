@@ -40,3 +40,9 @@ uv run --with requests python test_api.py
 > "
 api.py
 Write a single file python script as a client to quickly test these 4 api endpoints "
+
+**Prompt 3**
+> "I need to instrument this FastAPI app for the AWS Distro for OpenTelemetry (ADOT). Please update pyproject.toml with the necessary standard OpenTelemetry Python packages (API, SDK, FastAPI instrumentation, and OTLP exporter). Then, update src/main.py to initialize tracing and send traces to a local OTLP endpoint."
+
+**Prompt 4**
+> "Update the docker-compose.yml to include a local AWS OTel Collector sidecar (amazon/aws-otel-collector) and a Jaeger container (jaegertracing/all-in-one:latest). Provide a basic otel-local-config.yaml to configure the ADOT collector to export traces to the local Jaeger instance, so that I can view them in the browser at http://localhost:16686."
