@@ -170,6 +170,9 @@ Push to ECR
 **Prompt 11**
 > "Fix CKV_AWS_354, CKV_AWS_382, CKV_AWS_231, CKV_AWS_165, CKV_AWS_113, CKV_AWS_375 in infrastructure directory"
 
+**Prompt 12**
+> "In ECS Fargate tasks, the public subnets can be used, but for better security, I put them in private subnets and made them accessible from ALB. Eloborate this in README.md file, in Design Decisions section"
+
 ---
 
 ## CI/CD Pipeline
@@ -197,6 +200,30 @@ push to main
               └─ ECS rolling update  (wait for stability)
 ```
 
-
 ### CI/CD Pipeline (github actions)
 ![Alt text](images/pipeline.png)
+
+---
+
+## Design Decisions, Alternatives, and Trade-offs
+
+### 1. Security: GitHub OIDC & WAF
+- **Decision:** Used GitHub OIDC for AWS authentication and AWS WAF for application protection.
+- **Alternatives Considered:** IAM User Access Keys, no WAF.
+- **Trade-offs:** 
+    - **OIDC:** Eliminates the need to store long-lived AWS secrets in GitHub.
+    - **WAF:** Adds a layer of protection against common web exploits (SQLi, XSS). The trade-off is a slight increase in latency and cost, but it's essential for production security.
+
+### 2. Networking & Compute
+- **Decision:** ECS Fargate tasks are placed in **private subnets**.
+- **Rationale:** While ECS Fargate tasks can be placed in public subnets, I put them in private subnets for better security. This ensures that the application is not directly accessible from the internet and can only be reached through the Application Load Balancer (ALB), which is protected by the WAF.
+
+
+## Future Improvements
+
+Given more time, I would implement the following:
+
+1. Currently, the pipeline uses rolling updates. Implementing Blue/Green deployments would allow for zero-downtime updates and instant rollbacks if health checks fail.
+2. Use VPC Endpoints (PrivateLink) for ECR, and CloudWatch to keep all traffic within the AWS
+3. Instead of passing environment variables directly, integrate with **AWS Secrets Manager** to fetch sensitive data (like DB credentials) at runtime, enabling automatic secret rotation.
+4. Add a post-deployment test stage in the CI/CD pipeline that runs a suite of API tests against the newly deployed environment.
