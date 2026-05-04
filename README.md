@@ -34,11 +34,17 @@ uv run --with requests python test_api.py
 ```
 
 ## Terraform commands to deploy infrastructure
+
 ```bash
 terraform init
+
+# For Development
+terraform workspace select development || terraform workspace new development
 terraform plan -var-file=terraform-development.tfvars
 terraform apply -var-file=terraform-development.tfvars
 
+# For Production
+terraform workspace select production || terraform workspace new production
 terraform plan -var-file=terraform-production.tfvars
 terraform apply -var-file=terraform-production.tfvars
 ```
@@ -128,7 +134,7 @@ IAM:
 - Create an IAM OIDC identity provider for GitHub
 - Create an IAM Role for GitHub Actions:
 
-  - Restrict access to my GitHub repository 
+  - Restrict access to my GitHub repository
 https://github.com/obaidullah-faruk/devops_assignment (only for main branch)
 
 - Attach policies to the role to allow:
@@ -136,3 +142,49 @@ https://github.com/obaidullah-faruk/devops_assignment (only for main branch)
   - ECS (update service)
   - IAM PassRole (for ECS task execution)"
 
+**Prompt 10**
+>"Create a GitHub Actions workflow (.github/workflows/deploy.yml) that deploys the FastAPI app to AWS ECS.
+
+- Trigger on push to main branch
+
+Stages:
+   - Run "ruff check ."
+   - Use checkov or tfsec to scan Terraform code
+
+ - Use GitHub OIDC to assume an IAM role
+ - Build Docker Image:
+Image Security Scan:
+   - Use Trivy to scan the built image
+   - Fail on HIGH or CRITICAL vulnerabilities 
+Push to ECR
+- Update ECS service with new image
+- Use rolling update
+
+- Keep the workflow simple and production-like"
+
+---
+
+## CI/CD Pipeline
+
+The pipeline lives at [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) and runs automatically on every push to `main`.
+
+### Pipeline stages
+
+```
+push to main
+     │
+     ├─► [lint]            ruff check .
+     │
+     ├─► [terraform-scan]  checkov --framework terraform
+     │
+     └─► [build-and-deploy]  (runs only if both above pass)
+              │
+              ├─ Set image tag  (short Git SHA)
+              ├─ AWS OIDC login (no stored secrets)
+              ├─ ECR login
+              ├─ docker build   (layer-cache from :latest)
+              ├─ Trivy scan     (fail on HIGH / CRITICAL)
+              ├─ docker push    (:SHA  +  :latest)
+              ├─ Render new ECS task definition
+              └─ ECS rolling update  (wait for stability)
+```
