@@ -24,6 +24,11 @@ docker compose up --build
 
 ```
 
+## To Run a client
+```
+uv run --with requests python test_api.py
+```
+
 
 
 ## Prompts Used
@@ -31,3 +36,7 @@ docker compose up --build
 **Prompt 1**
 > "Dockerize this fastapi application. Write a Dockerfile using python:3.13-slim as the base image. Install uv inside the container and use uv sync to install dependencies. Then write a docker-compose.yml file that spins up the app and a postgresql 18 database. Please use .env.example as a template for the environment variables."
 
+**Prompt 2**
+> "
+api.py
+Write a single file python script as a client to quickly test these 4 api endpoints "
