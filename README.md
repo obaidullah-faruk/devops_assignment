@@ -29,6 +29,15 @@ docker compose up --build
 uv run --with requests python test_api.py
 ```
 
+## Terraform commands to deploy infrastructure
+```bash
+terraform init
+terraform plan -var-file=terraform-development.tfvars
+terraform apply -var-file=terraform-development.tfvars
+
+terraform plan -var-file=terraform-production.tfvars
+terraform apply -var-file=terraform-production.tfvars
+```
 
 
 ## Prompts Used
@@ -49,3 +58,51 @@ Write a single file python script as a client to quickly test these 4 api endpoi
 
 **Prompt 5**
 > "Logs and traces must correlate. Please update the application's logging configuration so that the OpenTelemetry trace_id and span_id are automatically injected into the JSON log output for every request. Also add a few logger.info() statements inside the src/modules/hero/api.py endpoints so that I have some actual log messages to test the correlation with."
+
+**Prompt 6**
+> "Create Terraform infrastructure inside an "infrastructure" directory.
+
+Region: us-east-1
+Structure:
+- main.tf
+- variables.tf
+- providers.tf
+- backend.tf
+- terraform-production.tfvars
+- terraform-development.tfvars
+
+Use modular architecture with modules:
+- modules/networking
+- modules/alb
+- modules/ecs
+- modules/ecr
+- modules/iam
+- modules/waf
+
+Backend:
+- Use S3 bucket "goldkinen-devops-assignment-terraform-state"
+- Enable native state locking with use_lockfile = true
+- Do not use DynamoDB
+
+Networking module:
+- Create VPC
+- 2 public subnets (for ALB across AZs)
+- 2 private subnets (for ECS Fargate and optional RDS)
+- Internet Gateway
+- Route tables
+- Single NAT Gateway in one public subnet
+
+WAF:
+- Create WAFv2 WebACL (REGIONAL)
+- Use AWS managed core rule set
+- Attach WebACL to ALB
+
+General:
+- Use variables for environment (dev/prod)
+- Separate tfvars for development and production
+- Ensure modules expose outputs and are reusable
+
+Use the latest terraform version"
+
+**Prompt 7**
+> "Instead of manual db_password, create a random password and made it sensitive in terraform and use it in the database."
