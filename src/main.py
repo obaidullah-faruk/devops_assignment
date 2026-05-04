@@ -35,7 +35,7 @@ tracer_provider.add_span_processor(span_processor)
 trace.set_tracer_provider(tracer_provider)
 
 # Instrument logging to inject trace_id and span_id
-LoggingInstrumentor().instrument(set_logging_format=False)
+LoggingInstrumentor().instrument(set_logging_format=True)
 
 
 @asynccontextmanager
