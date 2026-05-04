@@ -46,3 +46,6 @@ Write a single file python script as a client to quickly test these 4 api endpoi
 
 **Prompt 4**
 > "Update the docker-compose.yml to include a local AWS OTel Collector sidecar (amazon/aws-otel-collector) and a Jaeger container (jaegertracing/all-in-one:latest). Provide a basic otel-local-config.yaml to configure the ADOT collector to export traces to the local Jaeger instance, so that I can view them in the browser at http://localhost:16686."
+
+**Prompt 5**
+> "Logs and traces must correlate. Please update the application's logging configuration so that the OpenTelemetry trace_id and span_id are automatically injected into the JSON log output for every request. Also add a few logger.info() statements inside the src/modules/hero/api.py endpoints so that I have some actual log messages to test the correlation with."

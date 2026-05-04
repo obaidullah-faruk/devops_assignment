@@ -13,6 +13,8 @@ dependencies = [
     "opentelemetry-sdk>=1.41.1",
     "opentelemetry-instrumentation-fastapi>=0.62b1",
     "opentelemetry-exporter-otlp>=1.41.1",
+    "python-json-logger>=4.1.0",
+    "opentelemetry-instrumentation-logging>=0.62b1",
 ]
 
 [dependency-groups]
