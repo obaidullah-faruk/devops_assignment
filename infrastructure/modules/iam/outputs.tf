@@ -17,3 +17,7 @@ output "ecs_task_role_name" {
   description = "Name of the ECS Task Role."
   value       = aws_iam_role.ecs_task.name
 }
+output "rds_monitoring_role_arn" {
+  description = "ARN of the RDS Monitoring Role."
+  value       = aws_iam_role.rds_monitoring.arn
+}

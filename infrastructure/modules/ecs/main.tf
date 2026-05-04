@@ -3,10 +3,60 @@
 # ECS Cluster · Task Definition · Service · Security Group · CloudWatch Log Group
 # ──────────────────────────────────────────────────────────────
 
-# ── CloudWatch Log Group ────────────────────────────────────────
+# ── KMS Key for CloudWatch Logs (CKV_AWS_158) ──────────────────
+data "aws_caller_identity" "current" {}
+
+resource "aws_kms_key" "logs" {
+  description             = "KMS key for ECS CloudWatch log encryption"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+
+  # CloudWatch Logs requires this key policy to use the key
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogs"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${var.aws_region}.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${var.name_prefix}-logs-kms-key"
+  }
+}
+
+resource "aws_kms_alias" "logs" {
+  name          = "alias/${var.name_prefix}-logs"
+  target_key_id = aws_kms_key.logs.key_id
+}
+
+# ── CloudWatch Log Group ──────────────────────────────────────
 resource "aws_cloudwatch_log_group" "app" {
   name              = "/ecs/${var.name_prefix}"
-  retention_in_days = 30
+  retention_in_days = 365 # CKV_AWS_338: retain logs for at least 1 year
+  kms_key_id        = aws_kms_key.logs.arn # CKV_AWS_158: encrypt with CMK
 
   tags = {
     Name = "/ecs/${var.name_prefix}"
@@ -28,6 +78,7 @@ resource "aws_security_group" "ecs_tasks" {
   }
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"

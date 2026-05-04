@@ -26,6 +26,7 @@ resource "aws_security_group" "alb" {
   }
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -45,7 +46,11 @@ resource "aws_lb" "main" {
   security_groups    = [aws_security_group.alb.id]
   subnets            = var.public_subnet_ids
 
-  enable_deletion_protection = false
+  # Prevent accidental deletion of the ALB (CKV_AWS_150)
+  enable_deletion_protection = true
+
+  # Drop requests with malformed HTTP headers (CKV_AWS_131)
+  drop_invalid_header_fields = true
 
   tags = {
     Name = "${var.name_prefix}-alb"

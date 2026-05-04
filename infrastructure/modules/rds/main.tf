@@ -28,12 +28,7 @@ resource "aws_security_group" "rds" {
     cidr_blocks = [var.vpc_cidr]
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+
 
   tags = {
     Name = "${var.name_prefix}-rds-sg"
@@ -73,6 +68,22 @@ resource "random_password" "db_password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
+# ── KMS Key for RDS Encryption ───────────────────────────────────
+resource "aws_kms_key" "rds" {
+  description             = "KMS key for RDS storage and performance insights"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+
+  tags = {
+    Name = "${var.name_prefix}-rds-kms-key"
+  }
+}
+
+resource "aws_kms_alias" "rds" {
+  name          = "alias/${var.name_prefix}-rds"
+  target_key_id = aws_kms_key.rds.key_id
+}
+
 # ── RDS Instance ────────────────────────────────────────────────
 resource "aws_db_instance" "postgres" {
   identifier = "${var.name_prefix}-db"
@@ -85,6 +96,7 @@ resource "aws_db_instance" "postgres" {
   max_allocated_storage = var.max_allocated_storage
   storage_type          = "gp3"
   storage_encrypted     = true
+  kms_key_id            = aws_kms_key.rds.arn
 
   db_name  = var.db_name
   username = var.db_username
@@ -97,6 +109,7 @@ resource "aws_db_instance" "postgres" {
   multi_az               = var.multi_az
   publicly_accessible    = false
   deletion_protection    = var.deletion_protection
+  iam_database_authentication_enabled = true # CKV_AWS_161
   skip_final_snapshot    = var.skip_final_snapshot
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.name_prefix}-final-snapshot"
 
@@ -106,6 +119,10 @@ resource "aws_db_instance" "postgres" {
 
   performance_insights_enabled          = true
   performance_insights_retention_period = 7
+  performance_insights_kms_key_id       = aws_kms_key.rds.arn
+
+  monitoring_interval = 60
+  monitoring_role_arn = var.monitoring_role_arn
 
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 

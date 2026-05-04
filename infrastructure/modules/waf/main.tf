@@ -42,7 +42,7 @@ resource "aws_wafv2_web_acl" "main" {
     }
   }
 
-  # ── Known Bad Inputs ──────────────────────────────────────────
+  # ── Known Bad Inputs (includes Log4j / CVE-2021-44228) ───────────
   rule {
     name     = "AWSManagedRulesKnownBadInputsRuleSet"
     priority = 20
@@ -71,6 +71,8 @@ resource "aws_wafv2_web_acl" "main" {
       sampled_requests_enabled   = true
     }
   }
+
+
 
   # ── Amazon IP Reputation List ─────────────────────────────────
   rule {
@@ -136,11 +138,61 @@ resource "aws_wafv2_web_acl" "main" {
   }
 }
 
+# ── KMS Key for WAF CloudWatch Logs (CKV_AWS_158) ─────────────────
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
+resource "aws_kms_key" "waf_logs" {
+  description             = "KMS key for WAF CloudWatch log encryption"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogs"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${data.aws_region.current.id}.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${var.name_prefix}-waf-logs-kms-key"
+  }
+}
+
+resource "aws_kms_alias" "waf_logs" {
+  name          = "alias/${var.name_prefix}-waf-logs"
+  target_key_id = aws_kms_key.waf_logs.key_id
+}
+
 # ── CloudWatch Log Group for WAF ───────────────────────────────
 # WAF log group name MUST start with "aws-waf-logs-"
 resource "aws_cloudwatch_log_group" "waf" {
   name              = "aws-waf-logs-${var.name_prefix}"
-  retention_in_days = 30
+  retention_in_days = 365      # CKV_AWS_338: retain logs for at least 1 year
+  kms_key_id        = aws_kms_key.waf_logs.arn # CKV_AWS_158: encrypt with CMK
 
   tags = {
     Name = "aws-waf-logs-${var.name_prefix}"

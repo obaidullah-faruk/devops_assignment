@@ -71,3 +71,7 @@ variable "backup_retention_days" {
   type        = number
   default     = 7
 }
+variable "monitoring_role_arn" {
+  description = "ARN of the IAM role for RDS Enhanced Monitoring."
+  type        = string
+}

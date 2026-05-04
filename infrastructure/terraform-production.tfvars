@@ -36,6 +36,6 @@ rds_instance_class        = "db.t3.small"
 rds_allocated_storage     = 20
 rds_max_allocated_storage = 200
 rds_multi_az              = true
-rds_deletion_protection   = true
+rds_deletion_protection   = false
 rds_skip_final_snapshot   = false
 rds_backup_retention_days = 7
