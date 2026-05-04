@@ -18,6 +18,10 @@ export $(xargs < .env)
 uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
+## Architecture Diagram 
+![Alt text](images/assignment_arch.png)
+
+
 ## To Run using Docker 
 ```
 docker compose up --build
@@ -131,3 +135,4 @@ https://github.com/obaidullah-faruk/devops_assignment (only for main branch)
   - ECR (push images)
   - ECS (update service)
   - IAM PassRole (for ECS task execution)"
+
