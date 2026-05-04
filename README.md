@@ -48,6 +48,11 @@ terraform plan -var-file=terraform-production.tfvars
 terraform apply -var-file=terraform-production.tfvars
 ```
 
+## Logs and Traces 
+![Alt text](images/cloudwatch-logs.png)
+![Alt text](images/traces-1.png)
+![Alt text](images/traces-2.png)
+
 
 ## Prompts Used
 
@@ -160,6 +165,10 @@ Push to ECR
 - Use rolling update
 
 - Keep the workflow simple and production-like"
+
+
+**Prompt 11**
+> "Fix CKV_AWS_354, CKV_AWS_382, CKV_AWS_231, CKV_AWS_165, CKV_AWS_113, CKV_AWS_375 in infrastructure directory"
 
 ---
 
