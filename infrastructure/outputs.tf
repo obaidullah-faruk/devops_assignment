@@ -46,3 +46,8 @@ output "container_image" {
   description = "Full container image URI that was deployed (ECR URL + image tag)."
   value       = local.container_image
 }
+
+output "github_actions_role_arn" {
+  description = "IAM Role ARN to be assumed by GitHub Actions."
+  value       = module.github_oidc.role_arn
+}

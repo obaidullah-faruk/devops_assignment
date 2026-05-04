@@ -19,6 +19,12 @@ variable "environment" {
   }
 }
 
+variable "github_repo" {
+  description = "GitHub repository (owner/repo) to restrict GitHub Actions access to."
+  type        = string
+  default     = "obaidullah-faruk/devops_assignment"
+}
+
 variable "aws_region" {
   description = "AWS region to deploy resources."
   type        = string

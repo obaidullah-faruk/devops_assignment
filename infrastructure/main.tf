@@ -99,3 +99,14 @@ module "ecs" {
   aws_region              = var.aws_region
   database_url            = module.rds.database_url
 }
+
+# ── GitHub OIDC Authentication ─────────────────────────────────
+module "github_oidc" {
+  source = "./modules/github_oidc"
+
+  name_prefix                 = local.name_prefix
+  github_repo                 = var.github_repo
+  ecr_repository_arn          = module.ecr.repository_arn
+  ecs_task_execution_role_arn = module.iam.ecs_task_execution_role_arn
+  ecs_task_role_arn           = module.iam.ecs_task_role_arn
+}

@@ -120,3 +120,14 @@ IAM:
 - Remove any inline X-Ray policies that duplicate this functionality"
 
 **Prompt 9**
+>"Create Terraform configuration to enable GitHub Actions OIDC authentication with AWS.
+- Create an IAM OIDC identity provider for GitHub
+- Create an IAM Role for GitHub Actions:
+
+  - Restrict access to my GitHub repository 
+https://github.com/obaidullah-faruk/devops_assignment (only for main branch)
+
+- Attach policies to the role to allow:
+  - ECR (push images)
+  - ECS (update service)
+  - IAM PassRole (for ECS task execution)"
