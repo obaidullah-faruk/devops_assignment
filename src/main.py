@@ -47,6 +47,15 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+
+@app.get("/health", tags=["Health"], summary="ALB / container health check")
+async def health_check():
+    """
+    container health check
+    """
+    return {"status": "healthy", "service": "devops-assessment-fastapi"}
+
+
 app.include_router(hero_router)
 
 # Instrument the FastAPI app
