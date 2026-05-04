@@ -73,7 +73,12 @@ resource "aws_iam_role" "ecs_task" {
   }
 }
 
-# Allow the app to send traces to X-Ray and metrics/logs to CloudWatch
+resource "aws_iam_role_policy_attachment" "ecs_task_xray" {
+  role       = aws_iam_role.ecs_task.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+}
+
+# Allow the app to send metrics/logs to CloudWatch
 resource "aws_iam_role_policy" "ecs_task_app" {
   name = "${var.name_prefix}-ecs-task-app-policy"
   role = aws_iam_role.ecs_task.id
@@ -81,18 +86,6 @@ resource "aws_iam_role_policy" "ecs_task_app" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        Sid    = "XRay"
-        Effect = "Allow"
-        Action = [
-          "xray:PutTraceSegments",
-          "xray:PutTelemetryRecords",
-          "xray:GetSamplingRules",
-          "xray:GetSamplingTargets",
-          "xray:GetSamplingStatisticSummaries"
-        ]
-        Resource = "*"
-      },
       {
         Sid    = "CloudWatchMetrics"
         Effect = "Allow"

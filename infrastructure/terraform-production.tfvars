@@ -15,7 +15,7 @@ image_tag = "latest"
 # ECS sizing — larger for prod
 task_cpu              = 512
 task_memory           = 1024
-service_desired_count = 2
+service_desired_count = 1
 
 # ECR
 ecr_image_tag_mutability = "IMMUTABLE"

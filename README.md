@@ -106,3 +106,15 @@ Use the latest terraform version"
 
 **Prompt 7**
 > "Instead of manual db_password, create a random password and made it sensitive in terraform and use it in the database."
+
+**Prompt 8**
+> "Update the Terraform configuration to complete the missing IAM setup.
+
+IAM:
+- In iam.tf, attach the AWS managed policy:
+  arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+- Attach this policy to the ECS Task Role
+- Keep existing policies:
+  - AmazonECSTaskExecutionRolePolicy (for execution role)
+  - CloudWatch Logs permissions
+- Remove any inline X-Ray policies that duplicate this functionality"
